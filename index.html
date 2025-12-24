@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>GoalFriends - Share Goals &amp; Track Progress</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#ff4d00", // Vibrant orange/red like howbout accent
+              "primary-hover": "#e04300",
+              secondary: "#8b5cf6", // Purple accent
+              "background-light": "#ffffff",
+              "background-dark": "#000000",
+              "surface-light": "#f3f4f6",
+              "surface-dark": "#121212",
+              "text-main": "#000000",
+              "text-secondary": "#6b7280",
+              "border-color": "#e5e7eb",
+              "card-bg": "#ffffff",
+              "card-bg-dark": "#1e1e1e",
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              xl: "1rem",
+              "2xl": "1.5rem",
+              "3xl": "2rem",
+              "4xl": "2.5rem",
+              full: "9999px",
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              "float-delayed": "float 6s ease-in-out 3s infinite",
+              "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0)" },
+                "50%": { transform: "translateY(-20px)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Space Grotesk", sans-serif;
+      }
+      .text-gradient {
+        background: linear-gradient(135deg, #ff4d00 0%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .grid-bg {
+        background-size: 40px 40px;
+        background-image: linear-gradient(
+            to right,
+            rgba(0, 0, 0, 0.05) 1px,
+            transparent 1px
+          ),
+          linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+      }
+      .dark .grid-bg {
+        background-image: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.05) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.05) 1px,
+            transparent 1px
+          );
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      @keyframes scroll {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      @keyframes glow {
+        0%, 100% {
+          box-shadow: 0 0 20px rgba(255, 77, 0, 0.3), 0 0 40px rgba(255, 77, 0, 0.2);
+        }
+        50% {
+          box-shadow: 0 0 30px rgba(255, 77, 0, 0.5), 0 0 60px rgba(255, 77, 0, 0.3);
+        }
+      }
+      .chart-bar {
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transform-origin: bottom;
+      }
+      .chart-bar.animate {
+        animation: glow 2s ease-in-out infinite;
+      }
+      @keyframes barGrow {
+        0% {
+          transform: scaleY(0);
+          opacity: 0;
+        }
+        100% {
+          transform: scaleY(1);
+          opacity: 1;
+        }
+      }
+      .chart-bar-group .chart-bar {
+        transform-origin: bottom;
+        animation: barGrow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        opacity: 0;
+      }
+      .chart-bar-group .chart-bar:nth-child(1) { animation-delay: 0.1s; }
+      .chart-bar-group .chart-bar:nth-child(2) { animation-delay: 0.2s; }
+      .chart-bar-group .chart-bar:nth-child(3) { animation-delay: 0.3s; }
+      .chart-bar-group .chart-bar:nth-child(4) { animation-delay: 0.4s; }
+      .chart-bar-group .chart-bar:nth-child(5) { animation-delay: 0.5s; }
+      @keyframes popReaction {
+        0% {
+          transform: scale(0) translateY(8px);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.1) translateY(0);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1) translateY(0);
+          opacity: 1;
+        }
+      }
+      .reaction-bubble {
+        animation: popReaction 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        opacity: 0;
+      }
+      .reaction-bubble:nth-child(1) { animation-delay: 0.05s; }
+      .reaction-bubble:nth-child(2) { animation-delay: 0.15s; }
+      .reaction-bubble:nth-child(3) { animation-delay: 0.25s; }
+      .reaction-bubble:nth-child(4) { animation-delay: 0.35s; }
+      .emoji-rain-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        overflow: hidden;
+      }
+      .emoji-rain {
+        position: absolute;
+        font-size: 2rem;
+        animation: emojiFall linear forwards;
+        opacity: 0.9;
+        user-select: none;
+        will-change: transform;
+      }
+      @keyframes emojiFall {
+        0% {
+          transform: translateY(-100px) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(calc(100vh + 100px)) rotate(360deg);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark text-text-main dark:text-white transition-colors duration-200"
+  >
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+      <header
+        class="sticky top-0 z-50 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl border-b border-border-color/50 dark:border-white/10"
+      >
+        <div
+          class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full"
+        >
+          <div class="flex items-center gap-2 cursor-pointer group">
+            <div
+              class="flex items-center justify-center size-10 bg-black dark:bg-white rounded-xl text-white dark:text-black transition-transform group-hover:rotate-12"
+            >
+              <span class="material-symbols-outlined text-2xl">trophy</span>
+            </div>
+            <h2 class="text-2xl font-bold tracking-tighter">GoalFriends</h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <button
+              class="flex h-10 px-6 items-center justify-center rounded-full bg-black dark:bg-white text-white dark:text-black text-sm font-bold hover:scale-105 hover:shadow-lg transition-all transform active:scale-95"
+            >
+              Get App
+            </button>
+          </div>
+        </div>
+      </header>
+      <main class="flex-1 flex flex-col items-center w-full">
+        <section
+          class="w-full px-6 pt-12 pb-20 md:pt-24 md:pb-32 max-w-7xl relative"
+        >
+          <div
+            class="absolute top-20 right-10 md:right-40 w-64 h-64 bg-primary/20 rounded-full blur-[100px] -z-10 animate-pulse-slow"
+          ></div>
+          <div
+            class="absolute bottom-10 left-10 md:left-40 w-72 h-72 bg-secondary/20 rounded-full blur-[100px] -z-10 animate-pulse-slow"
+            style="animation-delay: 1s"
+          ></div>
+          <div class="flex flex-col lg:flex-row gap-16 items-center">
+            <div class="flex-1 flex flex-col gap-8 text-center lg:text-left z-10">
+              <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-light dark:bg-white/10 border border-black/5 dark:border-white/10 w-fit mx-auto lg:mx-0 backdrop-blur-sm"
+              >
+                <span class="size-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span
+                  class="text-sm font-bold text-text-main dark:text-white"
+                  >Join 50k+ active goal setters</span
+                >
+              </div>
+              <h1
+                class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1] tracking-tighter text-text-main dark:text-white"
+              >
+                Goals are <br />
+                <span class="text-gradient">better together.</span>
+              </h1>
+              <p
+                class="text-xl text-text-secondary dark:text-gray-400 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed"
+              >
+                Stop ghosting your resolutions. Share goals with friends, track
+                real progress, and get hype for every little win.
+              </p>
+              <div
+                class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-2"
+              >
+                <button
+                  class="h-14 px-8 flex items-center justify-center rounded-full bg-primary text-white text-lg font-bold hover:bg-primary-hover shadow-xl shadow-primary/20 transition-all transform hover:-translate-y-1 hover:scale-105"
+                >
+                  Start Your Streak
+                </button>
+                <button
+                  class="h-14 px-8 flex items-center justify-center rounded-full bg-white dark:bg-white/5 border-2 border-gray-100 dark:border-white/10 text-text-main dark:text-white text-lg font-bold hover:border-gray-300 dark:hover:border-white/30 transition-all"
+                >
+                  <span class="material-symbols-outlined mr-2">ios_share</span>
+                  Invite Friends
+                </button>
+              </div>
+              <div
+                class="flex items-center justify-center lg:justify-start gap-3 pt-4"
+              >
+                <div class="flex -space-x-4">
+                  <div
+                    class="w-12 h-12 rounded-full border-4 border-white dark:border-black bg-gray-200 bg-cover bg-center transition-transform hover:scale-110 hover:z-10"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBD3Nxu5GuPU82vkxSTQuU4ZkOurWHmXj3xapZM0RQ1Thbd42i7Zx9h3wKlbLBiYP13DRXVRiI0AAozIPTlANu5YYRajQPQHqJspb0-Lm-U_JVD9p3-1yTRgRixh4_N8jgPJfpHuxoj9vVuF5NiBkXIevXOVoGRcV1ZPOUd5X1KYr3IwCAgMB8UcZK33OyNeladsllL3ZUdSHdOVPHTpRNNLyIwDncGoeqVA6VK_1XAQrLTnnUNoRN8aGblS7x2qjsAQWFWFu2zo0XQ");'
+                  ></div>
+                  <div
+                    class="w-12 h-12 rounded-full border-4 border-white dark:border-black bg-gray-200 bg-cover bg-center transition-transform hover:scale-110 hover:z-10"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzBJ7gMNOJY3xoMkwV0d8IW--EmTLYSQHEsdyXgjGNmEW3Trv01vMEd2ieJ2whhf4iHiunKX1LQjBZWEfQoC7wa2Oywqg4HmgyEenHc7_mvML_4ji157Gpquym2dWjm9Pq6bgfnbs5ga5-uKKDPeWocoj93Ut9WEjgzKlbqwubkQOYgG_wom4aLTkFMf_1wSMR_GDACRp7j1tXLXdgJT-PeZ1fwdphAsEFvzx3q43R2Mwqd-jJ12VQd1eQkfoYA__zSfNAbpU4MnQy");'
+                  ></div>
+                  <div
+                    class="w-12 h-12 rounded-full border-4 border-white dark:border-black bg-gray-200 bg-cover bg-center transition-transform hover:scale-110 hover:z-10"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDNwoGtlt2aNqy3euH2UAYPJ9SBEVBOynL0CAjsF8SMnu3Qy_yJgTxHLFrGvMCh4oTmbLe2H1Xnml_hPH-jj82PNvcAUJ5jQ4kDPhTgHCRYndq3rNT2vZU_CSbN2brS7pCBUJWn6SzBDqJdhgqxHW-tVm8h06NiHVbx7yHArehPurqs4pl24sn-dPxLsZklg2AhQ-ROFgwJITAyDKLDrSpRQt1EqAsZY-zmkxull33xMD08Pga6nyJMSxE9EXHDWp9FTUrDw6CPO2iL");'
+                  ></div>
+                  <div
+                    class="w-12 h-12 rounded-full border-4 border-white dark:border-black bg-black text-white flex items-center justify-center text-xs font-bold transition-transform hover:scale-110 hover:z-10"
+                  >
+                    +2k
+                  </div>
+                </div>
+                <div class="text-left">
+                  <div class="flex text-yellow-400 text-sm">
+                    <span
+                      class="material-symbols-outlined text-[16px] fill-current"
+                      >star</span
+                    >
+                    <span
+                      class="material-symbols-outlined text-[16px] fill-current"
+                      >star</span
+                    >
+                    <span
+                      class="material-symbols-outlined text-[16px] fill-current"
+                      >star</span
+                    >
+                    <span
+                      class="material-symbols-outlined text-[16px] fill-current"
+                      >star</span
+                    >
+                    <span
+                      class="material-symbols-outlined text-[16px] fill-current"
+                      >star</span
+                    >
+                  </div>
+                  <p class="text-sm font-bold text-text-main dark:text-white">
+                    4.9/5 from users
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div
+              class="flex-1 w-full relative h-[700px] md:h-[750px] flex items-center justify-center perspective-1000"
+            >
+              <div
+                class="relative w-[340px] h-[640px] md:w-[380px] md:h-[700px] bg-black rounded-[3rem] border-[10px] border-gray-900 shadow-2xl overflow-hidden z-20 transform rotate-[-5deg] hover:rotate-0 transition-all duration-500 ease-out"
+              >
+                <div
+                  class="absolute top-0 left-1/2 -translate-x-1/2 h-6 w-32 bg-black rounded-b-2xl z-30"
+                ></div>
+                <div
+                  class="w-full h-full bg-gray-50 dark:bg-gray-950 overflow-hidden flex flex-col relative font-body"
+                >
+                  <div
+                    class="w-full px-6 pt-3 pb-2 flex justify-between items-center text-[10px] font-bold text-black dark:text-white z-20 opacity-80"
+                  >
+                    <span>9:41</span>
+                    <div class="flex gap-1">
+                      <span class="material-symbols-outlined text-[12px]"
+                        >signal_cellular_alt</span
+                      >
+                      <span class="material-symbols-outlined text-[12px]"
+                        >battery_full</span
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="px-5 pb-4 pt-2 flex justify-between items-end z-10 bg-gray-50/90 dark:bg-gray-950/90 backdrop-blur-sm sticky top-0"
+                  >
+                    <div>
+                      <p
+                        class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5"
+                      >
+                        Community
+                      </p>
+                      <h3
+                        class="font-display font-bold text-xl leading-none dark:text-white"
+                      >
+                        Goal Feed
+                      </h3>
+                    </div>
+                    <div
+                      class="size-8 rounded-full border border-gray-200 dark:border-gray-800 p-0.5"
+                    >
+                      <img
+                        alt="User"
+                        class="w-full h-full object-cover rounded-full"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2Di6m8ucpOtZE9w9WbJDO1fXRs9fmQUXKAN-xguWNKeZxUkU2hmlkOUPG58TMCYVZCUqIaQzXhNmufhWEy-fi_wA7I0Ryqqogh4I-k8JJon8mhhuRQSs0KnMXeIPYGVpxb5IIaj2XxWv71qrw33POMQgvFfYvY2bY5k72Jy03qBTZcnfdFSYglLafHJf7xvCGVpsQZHGvM6-_p5T1f_2TI47Ms8TG6wvnJvBkZyE2iOr-AOXWpkDei56Zl3cwNZJc_6izoORIbacf"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class="flex-1 overflow-y-auto hide-scrollbar px-4 pb-24 space-y-4"
+                  >
+                    <div
+                      class="bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-white/5"
+                    >
+                      <div class="flex justify-between items-start mb-3">
+                        <div class="flex gap-2 items-center">
+                          <div
+                            class="size-8 rounded-full bg-gray-100 bg-cover"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2fTetwe6Kq6XZvYJ1js8v6atEa-Ys7SS1eQu9V-lU8ZxjJ0JNa5wVrprUfMesTpXEYiFWlTrDp3wtITNHjUIAHFzJjR-I6a6tWasVs_yJ1B1tAO5kDfJKc0jkiciYJ9Xb7LppQv9DXhVPdWOTKE-u7bn8VW-GicaFmvgpDLw5sRY5lLoCVnZkgdVgrepbu6K2Jmqp_T-eAE4lB3WLbvbk3kDyIWVMF95xDsA9wLMzExtMfOGMwApMfOjJbmBUqC4eyedyiq0E-YYo");'
+                          ></div>
+                          <div>
+                            <p class="font-bold text-xs dark:text-white">
+                              Sarah Jenkins
+                            </p>
+                            <p class="text-[10px] text-gray-400">Just now</p>
+                          </div>
+                        </div>
+                        <span class="text-xs">🏃‍♀️</span>
+                      </div>
+                      <div class="mb-3">
+                        <p
+                          class="text-xs font-medium text-gray-600 dark:text-gray-300 mb-2"
+                        >
+                          Morning 5k Run
+                          <span class="text-primary font-bold">#completed</span>
+                        </p>
+                        <div
+                          class="w-full h-16 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/30 flex items-center px-3 gap-3"
+                        >
+                          <div
+                            class="size-10 rounded-full bg-orange-100 dark:bg-orange-800 text-orange-600 dark:text-orange-200 flex items-center justify-center text-lg font-bold"
+                          >
+                            <span class="material-symbols-outlined">check</span>
+                          </div>
+                          <div>
+                            <p
+                              class="text-xs font-bold text-gray-900 dark:text-white"
+                            >
+                              Goal Reached!
+                            </p>
+                            <p class="text-[10px] text-gray-500">
+                              Streak: 12 Days 🔥
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex justify-between items-center pt-1">
+                        <div class="flex -space-x-1.5 pl-1">
+                          <div
+                            class="size-5 rounded-full ring-2 ring-white dark:ring-gray-900 bg-gray-300 bg-cover"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAMNFYicuvkzo46MvZMZ3hotdj491Es0cELzNHOhzT_IJFdbsau1L9RVErl5X2YwYEJNdtjWmkBE3_iKKiPk8rhWMTvumjl_m6Ti3Qo1b1GKbk6Q02PWrhqeT1XeQOz8PH1Zqu1K9O8qpfPF_CUBt3uhHLTu1PbpxHK5Fm1B9iXcDvPcNHmglM3oWMH8H_sw--72VNpw-NBJAu2C2lvqq7uDtcYSVACQoxZ9Z7d8dAROqlZF6_zBcXzwMhc7PSZP-5fBROvrOxxkqkK");'
+                          ></div>
+                          <div
+                            class="size-5 rounded-full ring-2 ring-white dark:ring-gray-900 bg-gray-300 bg-cover"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCqNur9ZwpWCJOp4aEXQxKB8MuuepqFhKw6qRzjdXZOfuTruqwx9gUjEGaO4N_V7rv0nafTcqRfPQ-Cibn2eMyZwo4vWHUoVdDl9hu9YN_UVCvmZRXUgTrzteoc_V6sN1hptBFQcrul8lPQyEJWwppT5NgM0swcCU0WCQg1Z0kQPH9rqgOZtnE7d1InvD4rXdKSjZ4Hwys0ZWn1jjWtemDzuXFuQMl9IOk672VI8tPc81AtHF4Ea2gdJCJQXV5zZBI2ImDbJV_1MZxs");'
+                          ></div>
+                        </div>
+                        <div class="flex gap-3">
+                          <div
+                            class="flex items-center gap-1 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                          >
+                            <span class="material-symbols-outlined text-[16px]"
+                              >favorite</span
+                            >
+                            <span class="text-[10px] font-bold">24</span>
+                          </div>
+                          <div
+                            class="flex items-center gap-1 text-gray-400 hover:text-blue-500 transition-colors cursor-pointer"
+                          >
+                            <span class="material-symbols-outlined text-[16px]"
+                              >chat_bubble</span
+                            >
+                            <span class="text-[10px] font-bold">5</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-white/5 relative overflow-hidden"
+                    >
+                      <div
+                        class="absolute top-0 right-0 px-2 py-1 bg-secondary/10 rounded-bl-xl"
+                      >
+                        <p
+                          class="text-[8px] font-bold text-secondary uppercase"
+                        >
+                          Challenge
+                        </p>
+                      </div>
+                      <div class="flex gap-2 items-center mb-3">
+                        <div
+                          class="size-8 rounded-full bg-gray-100 bg-cover"
+                          style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzBJ7gMNOJY3xoMkwV0d8IW--EmTLYSQHEsdyXgjGNmEW3Trv01vMEd2ieJ2whhf4iHiunKX1LQjBZWEfQoC7wa2Oywqg4HmgyEenHc7_mvML_4ji157Gpquym2dWjm9Pq6bgfnbs5ga5-uKKDPeWocoj93Ut9WEjgzKlbqwubkQOYgG_wom4aLTkFMf_1wSMR_GDACRp7j1tXLXdgJT-PeZ1fwdphAsEFvzx3q43R2Mwqd-jJ12VQd1eQkfoYA__zSfNAbpU4MnQy");'
+                        ></div>
+                        <div>
+                          <p class="font-bold text-xs dark:text-white">
+                            Mike T.
+                          </p>
+                          <p class="text-[10px] text-gray-400">2h ago</p>
+                        </div>
+                      </div>
+                      <p class="text-sm font-bold dark:text-white mb-2">
+                        Read 30 pages 📚
+                      </p>
+                      <div
+                        class="relative w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden mb-2"
+                      >
+                        <div
+                          class="absolute top-0 left-0 h-full w-[65%] bg-secondary rounded-full"
+                        ></div>
+                      </div>
+                      <div
+                        class="flex justify-between text-[10px] text-gray-500 font-medium mb-3"
+                      >
+                        <span>Page 65</span>
+                        <span>Goal: 100</span>
+                      </div>
+                      <div class="flex gap-2">
+                        <button
+                          class="flex-1 bg-secondary/5 hover:bg-secondary/10 text-secondary text-[10px] font-bold py-1.5 rounded-lg transition-colors"
+                        >
+                          Encourage 👋
+                        </button>
+                        <button
+                          class="flex-1 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 text-gray-500 text-[10px] font-bold py-1.5 rounded-lg transition-colors"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      class="bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-white/5 opacity-80"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="size-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center"
+                        >
+                          <span class="material-symbols-outlined"
+                            >water_drop</span
+                          >
+                        </div>
+                        <div>
+                          <p class="text-xs font-bold dark:text-white">
+                            Daily Hydration
+                          </p>
+                          <p class="text-[10px] text-gray-500">
+                            Elena • 3/4 Complete
+                          </p>
+                        </div>
+                        <div class="ml-auto">
+                          <div
+                            class="size-6 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400"
+                          >
+                            <span class="material-symbols-outlined text-[14px]"
+                              >add</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="absolute bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md border-t border-gray-100 dark:border-gray-800 pb-6 pt-3 px-6 flex justify-between items-center z-20"
+                  >
+                    <button
+                      class="flex flex-col items-center gap-0.5 text-black dark:text-white"
+                    >
+                      <span class="material-symbols-outlined text-xl fill-current"
+                        >home</span
+                      >
+                    </button>
+                    <button
+                      class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600"
+                    >
+                      <span class="material-symbols-outlined text-xl"
+                        >search</span
+                      >
+                    </button>
+                    <button
+                      class="size-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform -mt-8 border-4 border-gray-50 dark:border-gray-950"
+                    >
+                      <span class="material-symbols-outlined text-2xl">add</span>
+                    </button>
+                    <button
+                      class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600"
+                    >
+                      <span class="material-symbols-outlined text-xl"
+                        >notifications</span
+                      >
+                    </button>
+                    <button
+                      class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600"
+                    >
+                      <span class="material-symbols-outlined text-xl"
+                        >person</span
+                      >
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute top-16 right-0 md:right-6 bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 animate-float z-30 max-w-[220px]"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="size-10 rounded-full bg-cover bg-center"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzBJ7gMNOJY3xoMkwV0d8IW--EmTLYSQHEsdyXgjGNmEW3Trv01vMEd2ieJ2whhf4iHiunKX1LQjBZWEfQoC7wa2Oywqg4HmgyEenHc7_mvML_4ji157Gpquym2dWjm9Pq6bgfnbs5ga5-uKKDPeWocoj93Ut9WEjgzKlbqwubkQOYgG_wom4aLTkFMf_1wSMR_GDACRp7j1tXLXdgJT-PeZ1fwdphAsEFvzx3q43R2Mwqd-jJ12VQd1eQkfoYA__zSfNAbpU4MnQy");'
+                  ></div>
+                  <div>
+                    <p class="text-xs font-bold dark:text-white">Mike</p>
+                    <p class="text-[10px] text-gray-500">
+                      Just finished his goal!
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute bottom-28 left-0 md:left-4 bg-black text-white p-5 rounded-2xl shadow-xl animate-float-delayed z-30 max-w-[240px]"
+              >
+                <div class="flex items-center gap-3">
+                  <span class="text-2xl">🔥</span>
+                  <div>
+                    <p class="text-xs font-bold">Streak Saved!</p>
+                    <p class="text-[10px] text-gray-400">
+                      You're on fire today.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section
+          class="w-full py-10 bg-black dark:bg.white text-white dark:text-black overflow-hidden transform -skew-y-2 origin-left scale-110 border-y-4 border-primary"
+        >
+          <div
+            class="flex gap-16 animate-[scroll_20s_linear_infinite] whitespace-nowrap items-center font-display text-4xl font-bold uppercase tracking-wider opacity-90"
+          >
+            <span>Smash Goals</span>
+            <span class="text-primary">•</span>
+            <span>Track Habits</span>
+            <span class="text-primary">•</span>
+            <span>Compete with Friends</span>
+            <span class="text-primary">•</span>
+            <span>Stay Accountable</span>
+            <span class="text-primary">•</span>
+            <span>Smash Goals</span>
+            <span class="text-primary">•</span>
+            <span>Track Habits</span>
+            <span class="text-primary">•</span>
+            <span>Compete with Friends</span>
+            <span class="text-primary">•</span>
+            <span>Stay Accountable</span>
+          </div>
+        </section>
+        <section
+          class="w-full px-6 py-20 md:py-32 max-w-7xl relative"
+          id="features"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-3 text-center mb-12">
+              <span
+                class="inline-block px-4 py-1.5 rounded-full border border-black/10 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-sm font-bold text-primary mb-4"
+              >
+                Features
+              </span>
+              <h2
+                class="text-4xl md:text-5xl font-bold text-text-main dark:text-white mb-6"
+              >
+                Built for social achievers.
+              </h2>
+            </div>
+            <div
+              class="group lg:col-span-2 bg-surface-light dark:bg-white/5 rounded-4xl p-8 md:p-12 border border-transparent hover:border-black/5 dark:hover:border-white/10 transition-all overflow-hidden relative"
+            >
+              <div class="relative z-10 max-w-md">
+                <h3 class="text-3xl font-bold mb-4 dark:text-white">
+                  Visualize Every Step
+                </h3>
+                <p class="text-text-secondary dark:text-gray-400 text-lg mb-8">
+                  Break down big dreams into tiny, manageable wins. Our visual
+                  progress bars make every step feel significant.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    class="px-4 py-2 bg-white dark:bg-black rounded-full text-sm font-bold shadow-sm"
+                    >🎯 Milestones</span
+                  >
+                  <span
+                    class="px-4 py-2 bg-white dark:bg-black rounded-full text-sm font-bold shadow-sm"
+                    >📊 Stats</span
+                  >
+                  <span
+                    class="px-4 py-2 bg-white dark:bg-black rounded-full text-sm font-bold shadow-sm"
+                    >📅 Calendar</span
+                  >
+                </div>
+              </div>
+              <div
+                class="absolute right-0 bottom-0 w-1/2 h-4/5 translate-x-1/4 translate-y-1/4"
+              >
+                <div
+                  class="w-full h-full bg-gradient-to-br from-white via-white to-gray-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 rounded-tl-3xl shadow-2xl p-6 border-2 border-primary/20 dark:border-primary/30 relative overflow-hidden"
+                  style="box-shadow: 0 20px 60px -15px rgba(255, 77, 0, 0.3), 0 0 0 1px rgba(255, 77, 0, 0.1);"
+                >
+                  <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                  <div class="relative z-10">
+                    <div class="flex items-end gap-2 h-32 mb-4 px-2 chart-bar-group">
+                      <div
+                        class="w-1/5 bg-gradient-to-t from-gray-200 to-gray-100 dark:from-gray-700 dark:to-gray-600 h-[30%] rounded-t-lg shadow-lg transition-all hover:scale-105 chart-bar"
+                      ></div>
+                      <div
+                        class="w-1/5 bg-gradient-to-t from-gray-300 to-gray-200 dark:from-gray-600 dark:to-gray-500 h-[50%] rounded-t-lg shadow-lg transition-all hover:scale-105 chart-bar"
+                      ></div>
+                      <div
+                        class="w-1/5 bg-gradient-to-t from-gray-200 to-gray-100 dark:from-gray-700 dark:to-gray-600 h-[40%] rounded-t-lg shadow-lg transition-all hover:scale-105 chart-bar"
+                      ></div>
+                      <div
+                        class="w-1/5 bg-gradient-to-t from-gray-300 to-gray-200 dark:from-gray-600 dark:to-gray-500 h-[70%] rounded-t-lg shadow-lg transition-all hover:scale-105 chart-bar"
+                      ></div>
+                      <div
+                        class="w-1/5 bg-gradient-to-t from-primary via-primary to-primary-hover h-[90%] rounded-t-lg shadow-xl transition-all hover:scale-110 hover:shadow-2xl chart-bar"
+                        style="box-shadow: 0 10px 30px -10px rgba(255, 77, 0, 0.5), inset 0 -2px 0 rgba(0,0,0,0.1);"
+                      ></div>
+                    </div>
+                    <div
+                      class="h-3 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner"
+                    >
+                      <div class="h-full bg-gradient-to-r from-primary via-primary to-primary-hover w-[80%] rounded-full shadow-lg relative"
+                        style="box-shadow: 0 2px 8px rgba(255, 77, 0, 0.4);"
+                      >
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="group bg-black text-white dark:bg-white dark:text-black rounded-4xl p-8 md:p-10 flex flex-col justify-between relative overflow-hidden"
+            >
+              <div
+                class="absolute top-0 right-0 w-32 h-32 bg-secondary rounded-full blur-[60px] opacity-50"
+              ></div>
+              <div class="relative z-10">
+                <div
+                  class="size-14 bg-white/10 dark:bg-black/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6"
+                >
+                  <span class="material-symbols-outlined text-3xl">bolt</span>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">Instant Hype</h3>
+                <p class="text-gray-400 dark:text-gray-600">
+                  Get notified instantly when friends crush it. Send reactions in
+                  one tap.
+                </p>
+              </div>
+              <div class="mt-8 flex gap-3">
+                <div
+                  class="emoji-trigger size-10 bg-white/20 dark:bg-black/20 rounded-full flex items-center justify-center animate-bounce delay-100 cursor-pointer hover:scale-110 transition-transform"
+                  data-emoji="🔥"
+                >
+                  🔥
+                </div>
+                <div
+                  class="emoji-trigger size-10 bg-white/20 dark:bg-black/20 rounded-full flex items-center justify-center animate-bounce delay-200 cursor-pointer hover:scale-110 transition-transform"
+                  data-emoji="👏"
+                >
+                  👏
+                </div>
+                <div
+                  class="emoji-trigger size-10 bg-white/20 dark:bg-black/20 rounded-full flex items-center justify-center animate-bounce delay-300 cursor-pointer hover:scale-110 transition-transform"
+                  data-emoji="🎉"
+                >
+                  🎉
+                </div>
+              </div>
+            </div>
+            <div
+              class="group bg-[#fdf2f8] dark:bg-pink-900/20 rounded-4xl p-8 md:p-10 flex flex-col relative overflow-hidden"
+            >
+              <div class="relative z-10">
+                <div
+                  class="size-14 bg-pink-100 dark:bg-pink-800 rounded-2xl flex items-center justify-center mb-6 text-pink-600 dark:text-pink-300"
+                >
+                  <span class="material-symbols-outlined text-3xl">group</span>
+                </div>
+                <h3 class="text-2xl font-bold mb-3 dark:text-white">
+                  Group Challenges
+                </h3>
+                <p class="text-text-secondary dark:text-gray-400">
+                  Create private leagues. Who can read the most books this month?
+                </p>
+              </div>
+              <div class="mt-6 flex -space-x-3">
+                <div
+                  class="size-10 rounded-full border-2 border-white dark:border-pink-900 bg-gray-200 bg-cover"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2fTetwe6Kq6XZvYJ1js8v6atEa-Ys7SS1eQu9V-lU8ZxjJ0JNa5wVrprUfMesTpXEYiFWlTrDp3wtITNHjUIAHFzJjR-I6a6tWasVs_yJ1B1tAO5kDfJKc0jkiciYJ9Xb7LppQv9DXhVPdWOTKE-u7bn8VW-GicaFmvgpDLw5sRY5lLoCVnZkgdVgrepbu6K2Jmqp_T-eAE4lB3WLbvbk3kDyIWVMF95xDsA9wLMzExtMfOGMwApMfOjJbmBUqC4eyedyiq0E-YYo");'
+                ></div>
+                <div
+                  class="size-10 rounded-full border-2 border-white dark:border-pink-900 bg-gray-200 bg-cover"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAMNFYicuvkzo46MvZMZ3hotdj491Es0cELzNHOhzT_IJFdbsau1L9RVErl5X2YwYEJNdtjWmkBE3_iKKiPk8rhWMTvumjl_m6Ti3Qo1b1GKbk6Q02PWrhqeT1XeQOz8PH1Zqu1K9O8qpfPF_CUBt3uhHLTu1PbpxHK5Fm1B9iXcDvPcNHmglM3oWMH8H_sw--72VNpw-NBJAu2C2lvqq7uDtcYSVACQoxZ9Z7d8dAROqlZF6_zBcXzwMhc7PSZP-5fBROvrOxxkqkK");'
+                ></div>
+                <div
+                  class="size-10 rounded-full border-2 border-white dark:border-pink-900 bg-gray-200 bg-cover"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCqNur9ZwpWCJOp4aEXQxKB8MuuepqFhKw6qRzjdXZOfuTruqwx9gUjEGaO4N_V7rv0nafTcqRfPQ-Cibn2eMyZwo4vWHUoVdDl9hu9YN_UVCvmZRXUgTrzteoc_V6sN1hptBFQcrul8lPQyEJWwppT5NgM0swcCU0WCQg1Z0kQPH9rqgOZtnE7d1InvD4rXdKSjZ4Hwys0ZWn1jjWtemDzuXFuQMl9IOk672VI8tPc81AtHF4Ea2gdJCJQXV5zZBI2ImDbJV_1MZxs");'
+                ></div>
+              </div>
+            </div>
+            <div
+              class="lg:col-span-2 bg-secondary/10 dark:bg-secondary/5 rounded-4xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden"
+              id="widget-section"
+            >
+              <div class="flex-1 relative z-10">
+                <h3 class="text-3xl font-bold mb-4 dark:text-white">
+                  Widget Ready
+                </h3>
+                <p class="text-text-secondary dark:text-gray-400 text-lg">
+                  Keep your goals front and center on your home screen. Never lose
+                  sight of what matters.
+                </p>
+              </div>
+              <div class="flex-1 w-full flex justify-center">
+                <div
+                  class="bg-white dark:bg-gray-800 p-4 rounded-3xl shadow-xl w-48 rotate-3 transition-transform hover:rotate-0"
+                >
+                  <div class="flex justify-between items-center mb-4">
+                    <span class="font-bold text-sm dark:text-white"
+                      >GoalFriends</span
+                    >
+                    <span class="size-2 rounded-full bg-green-500 animate-pulse"></span>
+                  </div>
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                      <span class="font-semibold">Today’s Focus</span>
+                      <span class="flex items-center gap-1 text-primary font-semibold">
+                        +12
+                        <span class="material-symbols-outlined text-[14px]">bolt</span>
+                      </span>
+                    </div>
+                    <div class="relative h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary-hover to-secondary rounded-full"></div>
+                    </div>
+                    <div class="relative h-20 mt-2">
+                      <div
+                        class="absolute left-2 top-6 size-6 rounded-full bg-black text-white text-[11px] flex items-center justify-center shadow-lg reaction-bubble"
+                      >
+                        🔥
+                      </div>
+                      <div
+                        class="absolute right-3 top-1 size-7 rounded-full bg-white dark:bg-gray-900 text-[11px] flex items-center justify-center shadow-lg border border-gray-100 dark:border-gray-700 reaction-bubble"
+                      >
+                        👏
+                      </div>
+                      <div
+                        class="absolute left-10 -top-2 size-8 rounded-full bg-secondary text-white text-[11px] flex items-center justify-center shadow-lg reaction-bubble"
+                      >
+                        🎉
+                      </div>
+                      <div
+                        class="absolute right-8 bottom-0 size-6 rounded-full bg-amber-400 text-black text-[11px] flex items-center justify-center shadow-lg reaction-bubble"
+                      >
+                        💬
+                      </div>
+                    </div>
+                    <div class="flex items-center justify-between text-[10px] text-gray-400">
+                      <span>Friends cheering you on</span>
+                      <span class="font-semibold text-primary">+3 live</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section
+          class="w-full bg-surface-light dark:bg-surface-dark py-24 relative overflow-hidden"
+        >
+          <div
+            class="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"
+          ></div>
+          <div
+            class="absolute bottom-0 right-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"
+          ></div>
+          <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+              <h2 class="text-4xl font-bold mb-4 dark:text-white">
+                Don't just take our word for it
+              </h2>
+              <p class="text-text-secondary dark:text-gray-400">
+                Join the community of doers.
+              </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div
+                class="bg-white dark:bg-white/5 p-8 rounded-3xl border border-gray-100 dark:border-white/10 hover:-translate-y-2 transition-transform duration-300 shadow-lg shadow-gray-200/50 dark:shadow-none"
+              >
+                <div class="flex items-center gap-4 mb-6">
+                  <div
+                    class="size-12 rounded-full bg-gray-200 bg-cover"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2fTetwe6Kq6XZvYJ1js8v6atEa-Ys7SS1eQu9V-lU8ZxjJ0JNa5wVrprUfMesTpXEYiFWlTrDp3wtITNHjUIAHFzJjR-I6a6tWasVs_yJ1B1tAO5kDfJKc0jkiciYJ9Xb7LppQv9DXhVPdWOTKE-u7bn8VW-GicaFmvgpDLw5sRY5lLoCVnZkgdVgrepbu6K2Jmqp_T-eAE4lB3WLbvbk3kDyIWVMF95xDsA9wLMzExtMfOGMwApMfOjJbmBUqC4eyedyiq0E-YYo");'
+                  ></div>
+                  <div>
+                    <p class="font-bold dark:text-white">Sarah Jenkins</p>
+                    <p class="text-xs text-gray-500">@sarah_runs</p>
+                  </div>
+                </div>
+                <p class="text-lg font-medium dark:text-gray-300">
+                  "The social pressure is EXACTLY what I needed. I haven't missed
+                  a run in 45 days. My friends won't let me!"
+                </p>
+              </div>
+              <div
+                class="bg-white dark:bg-white/5 p-8 rounded-3xl border border-gray-100 dark:border-white/10 hover:-translate-y-2 transition-transform duration-300 shadow-lg shadow-gray-200/50 dark:shadow-none md:mt-8"
+              >
+                <div class="flex items-center gap-4 mb-6">
+                  <div
+                    class="size-12 rounded-full bg-gray-200 bg-cover"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAMNFYicuvkzo46MvZMZ3hotdj491Es0cELzNHOhzT_IJFdbsau1L9RVErl5X2YwYEJNdtjWmkBE3_iKKiPk8rhWMTvumjl_m6Ti3Qo1b1GKbk6Q02PWrhqeT1XeQOz8PH1Zqu1K9O8qpfPF_CUBt3uhHLTu1PbpxHK5Fm1B9iXcDvPcNHmglM3oWMH8H_sw--72VNpw-NBJAu2C2lvqq7uDtcYSVACQoxZ9Z7d8dAROqlZF6_zBcXzwMhc7PSZP-5fBROvrOxxkqkK");'
+                  ></div>
+                  <div>
+                    <p class="font-bold dark:text-white">Marcus Chen</p>
+                    <p class="text-xs text-gray-500">@marcus_dev</p>
+                  </div>
+                </div>
+                <p class="text-lg font-medium dark:text-gray-300">
+                  "Cleanest goal tracker I've used. No clutter, just my goals and
+                  my friends cheering me on. Love the widgets."
+                </p>
+              </div>
+              <div
+                class="bg-white dark:bg-white/5 p-8 rounded-3xl border border-gray-100 dark:border-white/10 hover:-translate-y-2 transition-transform duration-300 shadow-lg shadow-gray-200/50 dark:shadow-none"
+              >
+                <div class="flex items-center gap-4 mb-6">
+                  <div
+                    class="size-12 rounded-full bg-gray-200 bg-cover"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCqNur9ZwpWCJOp4aEXQxKB8MuuepqFhKw6qRzjdXZOfuTruqwx9gUjEGaO4N_V7rv0nafTcqRfPQ-Cibn2eMyZwo4vWHUoVdDl9hu9YN_UVCvmZRXUgTrzteoc_V6sN1hptBFQcrul8lPQyEJWwppT5NgM0swcCU0WCQg1Z0kQPH9rqgOZtnE7d1InvD4rXdKSjZ4Hwys0ZWn1jjWtemDzuXFuQMl9IOk672VI8tPc81AtHF4Ea2gdJCQXV5zZBI2ImDbJV_1MZxs");'
+                  ></div>
+                  <div>
+                    <p class="font-bold dark:text-white">Elena Rodriguez</p>
+                    <p class="text-xs text-gray-500">@elena_b</p>
+                  </div>
+                </div>
+                <p class="text-lg font-medium dark:text-gray-300">
+                  "It feels like a game but for real life. The streak animations
+                  are so satisfying. Highly recommend for ADHD brains!"
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="w-full px-6 py-20 max-w-7xl">
+          <div
+            class="w-full rounded-[3rem] bg-black dark:bg-white text-white dark:text-black overflow-hidden relative shadow-2xl"
+          >
+            <div
+              class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-primary/30 blur-[80px]"
+            ></div>
+            <div
+              class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-secondary/30 blur-[80px]"
+            ></div>
+            <div
+              class="relative z-10 flex flex-col items-center justify-center text-center px-6 py-20 md:py-32"
+            >
+              <h2
+                class="text-5xl md:text-7xl font-bold mb-8 tracking-tight max-w-3xl leading-[1.1]"
+              >
+                Ready to start your winning streak?
+              </h2>
+              <p
+                class="text-gray-400 dark:text-gray-600 text-xl max-w-xl mb-12 font-medium"
+              >
+                Join thousands of goal setters who are achieving more together.
+                It's free to start.
+              </p>
+              <div
+                class="flex flex-col sm:flex-row gap-4 w-full justify-center items-center"
+              >
+                <button
+                  class="h-16 px-10 rounded-full bg-white dark:bg-black text-black dark:text-white text-xl font-bold hover:scale-105 transition-transform shadow-xl"
+                >
+                  Join for Free
+                </button>
+                <div class="flex flex-col items-start gap-1">
+                  <div class="flex -space-x-2">
+                    <div
+                      class="size-8 rounded-full border-2 border-black dark:border-white bg-gray-300 bg-cover"
+                      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBe9TefQEIqI4ZpZrugR4SmgJ4cGKHIOiHFtUPRmvUPJ1eLhgRFumKKfMSxBoIPXbLh_iQLKhjiVqigsdDnopKdiyycAC_9XYIYJCBje5GWlxIujMDhVy27OONCjbYvALLZXBKVNd2m1OhxQQiJ-bsK9gzPUlefnNrEvttSNz8DVqYYPpdSeMuc6ih-N7ELZ9Q6UT4BN5AY6VxlKM0-_i2QbbvuWDpNXPJY_oit9bZuhf64vC0ZZJC90lf8uT0Bnlp9afyNi-gaTlE4");'
+                    ></div>
+                    <div
+                      class="size-8 rounded-full border-2 border-black dark:border-white bg-gray-300 bg-cover"
+                      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCMrxjxQ_tm-6y8Zzt4oF-hF87C2ZHHbpz2sAGQ4VBbzob0m-CrtGUbSq0d8eb4jcKM5IRLJ8-OgkomIoWWUae1o8igsFDqmxQyVm6XJuMlqPG-NNvTt79yARLqTf0g7ss7XyDWesNON3EhnhhS8s2zxD7Gqt1AXJaLcumbES0udIjtVoiAbKWJIsiRIUs16XwrfVX1y9DuKLb0pfY2K_viGMDQhw_22zuHqLIjSEZsqrSDCD13GiN6Pg6mz5RRzenWnA_bdTIguc-t");'
+                    ></div>
+                    <div
+                      class="size-8 rounded-full border-2 border-black dark:border-white bg-gray-300 bg-cover"
+                      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDSuAv_OL_fYmC3ZCYKURyAeeU-LtcUsrQrZLYQgBOZes7HE2RimLu5VTkW3iMyyVHcEpW_QAvAF1kxqrNqaEAKbBb2alLiYGWJfcsmBIcmOz9hBuCgSZJcxkSkNyhfTlG4M_MhvGVDk5iYHA8RhpXm-vyrkn8rCZmr9NuZhaLroGM75XJai0hka-tMKO8QccvYMNaMsGxF3vwvHhG037hsSgcUtyb1LGdUhBuGoQR14ZJb-BnseTPp0HWZ2OMlMF9G2eQ-etevE1sp");'
+                    ></div>
+                  </div>
+                  <span class="text-xs text-gray-400 font-bold ml-1"
+                    >Join 50k+ others</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer
+        class="w-full bg-surface-light dark:bg-black pt-20 pb-10 border-t border-border-color dark:border-gray-800"
+      >
+        <div class="max-w-7xl mx-auto px-6">
+          <div
+            class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16 items-start"
+          >
+            <div class="md:col-span-2">
+              <div class="flex items-center gap-2 mb-6">
+                <div
+                  class="flex items-center justify-center size-8 bg-black dark:bg-white rounded-lg text-white dark:text-black"
+                >
+                  <span class="material-symbols-outlined text-lg">trophy</span>
+                </div>
+                <h2 class="text-xl font-bold tracking-tight">GoalFriends</h2>
+              </div>
+              <p
+                class="text-text-secondary dark:text-gray-400 mb-6 max-w-xs font-medium"
+              >
+                Making self-improvement social, fun, and addictively effective.
+              </p>
+            </div>
+            <div class="md:col-span-1 md:text-right md:flex md:flex-col md:items-end">
+              <h4 class="font-bold text-text-main dark:text-white mb-6">
+                Get the app
+              </h4>
+              <div class="flex flex-col gap-3 w-full md:w-auto md:items-end">
+                <button
+                  class="flex items-center gap-3 bg-black dark:bg.white text-white dark:text-black px-4 py-3 rounded-xl hover:opacity-90 transition-opacity w-full sm:w-auto justify-center md:justify-end"
+                >
+                  <span class="material-symbols-outlined text-2xl">ios</span>
+                  <div class="text-left">
+                    <div
+                      class="text-[10px] uppercase font-bold opacity-70"
+                    >
+                      Download on the
+                    </div>
+                    <div class="text-sm font-bold leading-none">
+                      App Store
+                    </div>
+                  </div>
+                </button>
+                <button
+                  class="flex items-center gap-3 bg-gray-100 dark:bg-white/10 text-black dark:text-white px-4 py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-white/20 transition-colors w-full sm:w-auto justify-center md:justify-end"
+                >
+                  <span class="material-symbols-outlined text-2xl"
+                    >android</span
+                  >
+                  <div class="text-left">
+                    <div
+                      class="text-[10px] uppercase font-bold opacity-70"
+                    >
+                      Get it on
+                    </div>
+                    <div class="text-sm font-bold leading-none">
+                      Google Play
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div
+            class="pt-8 border-t border-gray-200 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-4"
+          >
+            <p
+              class="text-sm text-text-secondary dark:text-gray-500 font-medium"
+            >
+              © 2025 GoalFriends Inc. All rights reserved.
+            </p>
+            <div class="flex gap-6">
+              <a
+                class="text-sm text-text-secondary dark:text-gray-500 hover:text-black dark:hover:text-white font-medium"
+                href="#"
+                >Privacy</a
+              >
+              <a
+                class="text-sm text-text-secondary dark:text-gray-500 hover:text-black dark:hover:text-white font-medium"
+                href="#"
+                >Terms</a
+              >
+              <a
+                class="text-sm text-text-secondary dark:text-gray-500 hover:text-black dark:hover:text-white font-medium"
+                href="#"
+                >Cookies</a
+              >
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script>
+      // Emoji rainfall effect on hover
+      function createEmojiRain(emoji) {
+        // Create container if it doesn't exist
+        let container = document.getElementById('emoji-rain-container');
+        if (!container) {
+          container = document.createElement('div');
+          container.id = 'emoji-rain-container';
+          document.body.appendChild(container);
+        }
+
+        // Clear any existing rain
+        container.innerHTML = '';
+
+        // Create 50 emoji elements
+        const emojiCount = 50;
+        const duration = 1000; // 1 second
+
+        for (let i = 0; i < emojiCount; i++) {
+          const emojiEl = document.createElement('div');
+          emojiEl.className = 'emoji-rain';
+          emojiEl.textContent = emoji;
+          
+          // Random horizontal position
+          const left = Math.random() * 100;
+          
+          // Random animation duration (0.8s to 1.2s)
+          const animDuration = 0.8 + Math.random() * 0.4;
+          
+          // Random delay (0 to 0.3s)
+          const delay = Math.random() * 0.3;
+          
+          emojiEl.style.left = left + '%';
+          emojiEl.style.animationDuration = animDuration + 's';
+          emojiEl.style.animationDelay = delay + 's';
+          
+          container.appendChild(emojiEl);
+        }
+
+        // Remove container after animation completes
+        setTimeout(() => {
+          if (container && container.parentNode) {
+            container.innerHTML = '';
+          }
+        }, duration + 500);
+      }
+
+      // Add hover / tap event listeners to emoji triggers
+      document.addEventListener('DOMContentLoaded', function () {
+        const emojiTriggers = document.querySelectorAll('.emoji-trigger');
+        let lastTriggerTime = 0;
+
+        function handleTrigger(emoji) {
+          const now = Date.now();
+          // Simple throttle so it doesn't spam if user wiggles mouse
+          if (now - lastTriggerTime < 500) return;
+          lastTriggerTime = now;
+          createEmojiRain(emoji);
+        }
+
+        emojiTriggers.forEach((trigger) => {
+          const emoji = trigger.getAttribute('data-emoji');
+
+          trigger.addEventListener('mouseenter', () => handleTrigger(emoji));
+          trigger.addEventListener('click', () => handleTrigger(emoji));
+          trigger.addEventListener('touchstart', () => handleTrigger(emoji), {
+            passive: true,
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
+
+
