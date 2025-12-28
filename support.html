@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Support - Achieva</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#ff4d00",
+              "primary-hover": "#e04300",
+              secondary: "#8b5cf6",
+              "background-light": "#ffffff",
+              "background-dark": "#000000",
+              "surface-light": "#f3f4f6",
+              "surface-dark": "#121212",
+              "text-main": "#000000",
+              "text-secondary": "#6b7280",
+              "border-color": "#e5e7eb",
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      h1, h2, h3 {
+        font-family: "Space Grotesk", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-background-light dark:bg-background-dark text-text-main dark:text-white transition-colors duration-200">
+    <div class="relative flex min-h-screen w-full flex-col">
+      <header class="sticky top-0 z-50 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl border-b border-border-color/50 dark:border-white/10">
+        <div class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
+          <a href="/" class="flex items-center gap-2 cursor-pointer group">
+            <div class="flex items-center justify-center size-10 bg-black dark:bg-white rounded-xl text-white dark:text-black transition-transform group-hover:rotate-12">
+              <span class="material-symbols-outlined text-2xl">trophy</span>
+            </div>
+            <h2 class="text-2xl font-bold tracking-tighter">Achieva</h2>
+          </a>
+        </div>
+      </header>
+
+      <main class="flex-1 max-w-4xl mx-auto px-6 py-12 md:py-20 text-center">
+        <div class="inline-flex items-center justify-center size-20 bg-primary/10 rounded-full mb-8">
+          <span class="material-symbols-outlined text-4xl text-primary">support_agent</span>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tighter">How can we help?</h1>
+        <p class="text-xl text-text-secondary dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+          Need help with your goals, found a bug, or just want to say hi? We're here for you.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+          <div class="bg-surface-light dark:bg-white/5 p-8 rounded-3xl border border-border-color dark:border-white/10 flex flex-col items-center text-center">
+            <span class="material-symbols-outlined text-3xl mb-4 text-primary">mail</span>
+            <h3 class="text-2xl font-bold mb-2">Email Support</h3>
+            <p class="text-text-secondary dark:text-gray-400 mb-6">Drop us a line and we'll get back to you within 24 hours.</p>
+            <a href="mailto:josh29@stanford.edu" class="text-xl font-bold text-primary hover:underline">josh29@stanford.edu</a>
+          </div>
+
+          <div class="bg-surface-light dark:bg-white/5 p-8 rounded-3xl border border-border-color dark:border-white/10 flex flex-col items-center text-center">
+            <span class="material-symbols-outlined text-3xl mb-4 text-secondary">chat_bubble</span>
+            <h3 class="text-2xl font-bold mb-2">Socials</h3>
+            <p class="text-text-secondary dark:text-gray-400 mb-6">Follow us for updates and community spotlights.</p>
+            <div class="flex gap-4">
+               <a href="#" class="font-bold hover:text-primary transition-colors">Twitter</a>
+               <a href="#" class="font-bold hover:text-primary transition-colors">Instagram</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-20 py-12 px-8 bg-black dark:bg-white text-white dark:text-black rounded-4xl">
+           <h2 class="text-3xl font-bold mb-4">FAQ</h2>
+           <div class="space-y-6 text-left max-w-2xl mx-auto mt-8">
+              <div>
+                 <h4 class="font-bold text-lg mb-1">Is Achieva free?</h4>
+                 <p class="opacity-70">Yes! Achieva is free to download and use for all your goal tracking needs.</p>
+              </div>
+              <div>
+                 <h4 class="font-bold text-lg mb-1">How do I invite friends?</h4>
+                 <p class="opacity-70">Tap the 'Invite' button in your profile to share your unique link with friends.</p>
+              </div>
+           </div>
+        </div>
+      </main>
+
+      <footer class="w-full bg-surface-light dark:bg-black py-10 border-t border-border-color dark:border-gray-800 mt-20">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+          <p class="text-sm text-text-secondary dark:text-gray-500">
+            © 2025 Achieva Inc. All rights reserved.
+          </p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
+
