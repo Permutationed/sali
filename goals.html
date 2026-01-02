@@ -117,8 +117,8 @@
     </div>
 
     <script>
-      // Initialize Supabase client using centralized config
-      const supabaseClient = getSupabaseClient();
+      // Supabase client will be initialized asynchronously
+      let supabaseClient = null;
 
       // Format date
       function formatDate(dateString) {
@@ -176,13 +176,16 @@
 
       // Load all goals
       async function loadGoals() {
+        // Initialize Supabase client from server config
+        supabaseClient = await getSupabaseClient();
+        
         // Check if Supabase client is initialized
         if (!supabaseClient) {
           document.getElementById('loading').classList.add('hidden');
           document.getElementById('error').classList.remove('hidden');
           document.getElementById('error-details').innerHTML = `
             <p class="font-bold text-red-500 mb-2">Supabase not configured!</p>
-            <p>Please update <code class="bg-black/5 dark:bg-white/10 px-2 py-1 rounded">/js/config.js</code> with your credentials.</p>
+            <p>Make sure your <code class="bg-black/5 dark:bg-white/10 px-2 py-1 rounded">.env</code> file has SUPABASE_URL and SUPABASE_ANON_KEY set.</p>
           `;
           return;
         }

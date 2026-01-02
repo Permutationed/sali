@@ -167,8 +167,8 @@
     </div>
 
     <script>
-      // Initialize Supabase client using centralized config
-      const supabaseClient = getSupabaseClient();
+      // Supabase client will be initialized asynchronously
+      let supabaseClient = null;
 
       // Get goal ID from URL
       function getGoalIdFromUrl() {
@@ -198,9 +198,12 @@
 
       // Load goal data
       async function loadGoal() {
+        // Initialize Supabase client from server config
+        supabaseClient = await getSupabaseClient();
+        
         // Check if Supabase client is initialized
         if (!supabaseClient) {
-          showError('Supabase Configuration Error', 'Supabase is not configured. Please update /js/config.js with your credentials.', true);
+          showError('Supabase Configuration Error', 'Supabase is not configured. Make sure your .env file has SUPABASE_URL and SUPABASE_ANON_KEY set.', true);
           return;
         }
 
