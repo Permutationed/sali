@@ -277,8 +277,9 @@
         document.getElementById('goal-description').textContent = 
           goal.description || goal.details || 'No description provided.';
 
-        // Set share URL
-        const shareUrl = window.location.origin + window.location.pathname;
+        // Set share URL - always use production domain
+        const goalId = getGoalIdFromUrl();
+        const shareUrl = `https://achieva.app/${goalId}`;
         document.getElementById('goal-url').textContent = shareUrl;
       }
 
@@ -297,7 +298,8 @@
 
       // Copy goal link
       function copyGoalLink() {
-        const url = window.location.href;
+        const goalId = getGoalIdFromUrl();
+        const url = `https://achieva.app/${goalId}`;
         navigator.clipboard.writeText(url).then(() => {
           const btn = event.target;
           const originalText = btn.textContent;
