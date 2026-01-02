@@ -1,0 +1,16 @@
+{
+  "name": "achieva",
+  "version": "1.0.0",
+  "description": "Achieva - Share Goals & Track Progress",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "keywords": ["goals", "tracking", "productivity"],
+  "author": "",
+  "license": "ISC"
+}

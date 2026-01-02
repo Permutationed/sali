@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>All Goals - Achieva</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#ff4d00",
+              "primary-hover": "#e04300",
+              secondary: "#8b5cf6",
+              "background-light": "#ffffff",
+              "background-dark": "#000000",
+              "surface-light": "#f3f4f6",
+              "surface-dark": "#121212",
+              "text-main": "#000000",
+              "text-secondary": "#6b7280",
+              "border-color": "#e5e7eb",
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      h1, h2, h3 {
+        font-family: "Space Grotesk", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-background-light dark:bg-background-dark text-text-main dark:text-white transition-colors duration-200">
+    <div class="relative flex min-h-screen w-full flex-col">
+      <header class="sticky top-0 z-50 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl border-b border-border-color/50 dark:border-white/10">
+        <div class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
+          <a href="/" class="flex items-center gap-2 cursor-pointer group">
+            <div class="flex items-center justify-center size-10 bg-black dark:bg-white rounded-xl text-white dark:text-black transition-transform group-hover:rotate-12">
+              <span class="material-symbols-outlined text-2xl">trophy</span>
+            </div>
+            <h2 class="text-2xl font-bold tracking-tighter">Achieva</h2>
+          </a>
+        </div>
+      </header>
+
+      <main class="flex-1 max-w-7xl mx-auto px-6 py-12 md:py-20 w-full">
+        <div class="mb-12">
+          <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tighter">All Goals</h1>
+          <p class="text-xl text-text-secondary dark:text-gray-400">Browse and share goals from the Achieva community</p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex flex-col items-center justify-center py-20">
+          <div class="size-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p class="text-text-secondary dark:text-gray-400">Loading goals...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="hidden text-center py-20">
+          <span class="material-symbols-outlined text-6xl text-red-500 mb-4">error</span>
+          <h2 class="text-2xl font-bold mb-2">Failed to Load Goals</h2>
+          <p class="text-text-secondary dark:text-gray-400">Please check your Supabase configuration.</p>
+        </div>
+
+        <!-- Goals Grid -->
+        <div id="goals-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Goals will be inserted here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-20">
+          <span class="material-symbols-outlined text-6xl text-text-secondary dark:text-gray-400 mb-4">inbox</span>
+          <h2 class="text-2xl font-bold mb-2">No Goals Yet</h2>
+          <p class="text-text-secondary dark:text-gray-400">Be the first to create a goal!</p>
+        </div>
+      </main>
+
+      <footer class="w-full bg-surface-light dark:bg-black py-10 border-t border-border-color dark:border-gray-800 mt-20">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+          <p class="text-sm text-text-secondary dark:text-gray-500">
+            © 2025 Achieva Inc. All rights reserved.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // Supabase Configuration - REPLACE WITH YOUR ACTUAL VALUES
+      const SUPABASE_URL = 'https://your-project-id.supabase.co';
+      const SUPABASE_ANON_KEY = 'your-anon-key-here';
+
+      // Initialize Supabase client
+      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // Format date
+      function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric'
+        });
+      }
+
+      // Create goal card HTML
+      function createGoalCard(goal) {
+        const goalId = goal.id;
+        const title = goal.title || goal.name || 'Untitled Goal';
+        const icon = goal.icon || goal.emoji || '🎯';
+        const description = goal.description || goal.details || 'No description provided.';
+        const status = goal.status || 'active';
+        const current = goal.current_progress || goal.progress || goal.current || 0;
+        const target = goal.target || goal.target_value || 100;
+        const percentage = Math.min((current / target) * 100, 100);
+        const created = formatDate(goal.created_at);
+
+        const statusColor = status === 'completed' ? 'text-green-500' :
+                           status === 'in_progress' ? 'text-primary' : 
+                           'text-text-secondary';
+
+        return `
+          <a href="/goal.html?id=${goalId}" class="block bg-surface-light dark:bg-white/5 p-6 rounded-3xl border border-border-color dark:border-white/10 hover:border-primary transition-all hover:shadow-lg group">
+            <div class="flex items-start gap-4 mb-4">
+              <span class="text-3xl">${icon}</span>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-xl font-bold mb-1 group-hover:text-primary transition-colors line-clamp-2">${title}</h3>
+                <p class="text-xs font-bold uppercase tracking-wider ${statusColor}">${status}</p>
+              </div>
+            </div>
+            <p class="text-sm text-text-secondary dark:text-gray-400 mb-4 line-clamp-2">${description}</p>
+            <div class="mb-4">
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-bold">${current} / ${target}</span>
+                <span class="text-text-secondary dark:text-gray-400">${Math.round(percentage)}%</span>
+              </div>
+              <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-primary to-primary-hover rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-xs text-text-secondary dark:text-gray-400">
+              <span>Created ${created}</span>
+              <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </div>
+          </a>
+        `;
+      }
+
+      // Load all goals
+      async function loadGoals() {
+        try {
+          const { data, error } = await supabaseClient
+            .from('goals')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+
+          document.getElementById('loading').classList.add('hidden');
+
+          if (!data || data.length === 0) {
+            document.getElementById('empty-state').classList.remove('hidden');
+            return;
+          }
+
+          const grid = document.getElementById('goals-grid');
+          grid.classList.remove('hidden');
+          
+          grid.innerHTML = data.map(goal => createGoalCard(goal)).join('');
+        } catch (error) {
+          console.error('Error loading goals:', error);
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('error').classList.remove('hidden');
+        }
+      }
+
+      // Load goals when page loads
+      document.addEventListener('DOMContentLoaded', loadGoals);
+    </script>
+  </body>
+</html>
