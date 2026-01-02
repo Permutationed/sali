@@ -210,17 +210,8 @@
         });
       }
 
-      // Load goal data
+      // Load goal data via server-side API (bypasses RLS)
       async function loadGoal() {
-        // Initialize Supabase client from server config
-        supabaseClient = await getSupabaseClient();
-        
-        // Check if Supabase client is initialized
-        if (!supabaseClient) {
-          showError('Supabase Configuration Error', 'Supabase is not configured. Make sure your .env file has SUPABASE_URL and SUPABASE_ANON_KEY set.', true);
-          return;
-        }
-
         const goalId = getGoalIdFromUrl();
         
         if (!goalId) {
@@ -229,28 +220,23 @@
         }
 
         try {
-          // Use maybeSingle() instead of single() to avoid error when no rows found
-          const { data, error } = await supabaseClient
-            .from('goals')
-            .select('*')
-            .eq('id', goalId)
-            .maybeSingle();
+          // Fetch goal from server-side API (bypasses RLS)
+          const response = await fetch(`/api/goal/${goalId}`);
+          const result = await response.json();
 
-          if (error) throw error;
-
-          if (data) {
-            displayGoal(data);
-          } else {
-            showError('Goal Not Found', `No goal found with ID: ${goalId}. It may have been deleted or the ID is incorrect.`);
+          if (!response.ok) {
+            if (response.status === 404) {
+              showError('Goal Not Found', `No goal found with ID: ${goalId}. It may have been deleted or the ID is incorrect.`);
+            } else {
+              showError('Error Loading Goal', result.error || 'Failed to load goal.');
+            }
+            return;
           }
+
+          displayGoal(result);
         } catch (error) {
           console.error('Error loading goal:', error);
-          // Check for common errors
-          let errorMessage = error.message || 'Failed to load goal.';
-          if (error.message && error.message.includes('does not exist')) {
-            errorMessage = 'The goals table does not exist in your database. Please create it first.';
-          }
-          showError('Error Loading Goal', errorMessage);
+          showError('Error Loading Goal', error.message || 'Failed to load goal. Please try again.');
         }
       }
 
