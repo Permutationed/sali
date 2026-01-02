@@ -16,6 +16,7 @@
     />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/config.js"></script>
     <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -79,7 +80,18 @@
         <div id="error" class="hidden text-center py-20">
           <span class="material-symbols-outlined text-6xl text-red-500 mb-4">error</span>
           <h2 class="text-2xl font-bold mb-2">Failed to Load Goals</h2>
-          <p class="text-text-secondary dark:text-gray-400">Please check your Supabase configuration.</p>
+          <div id="error-details" class="text-text-secondary dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+            <p>Please check your Supabase configuration.</p>
+          </div>
+          <div class="bg-surface-light dark:bg-white/5 p-6 rounded-2xl border border-border-color dark:border-white/10 max-w-2xl mx-auto text-left">
+            <h3 class="font-bold mb-3">Setup Instructions:</h3>
+            <ol class="list-decimal list-inside space-y-2 text-sm">
+              <li>Open <code class="bg-black/5 dark:bg-white/10 px-2 py-1 rounded">/js/config.js</code></li>
+              <li>Replace <code class="bg-black/5 dark:bg-white/10 px-2 py-1 rounded">SUPABASE_CONFIG.url</code> with your Supabase project URL</li>
+              <li>Replace <code class="bg-black/5 dark:bg-white/10 px-2 py-1 rounded">SUPABASE_CONFIG.anonKey</code> with your anon/public key</li>
+              <li>Get these from: Supabase Dashboard → Settings → API</li>
+            </ol>
+          </div>
         </div>
 
         <!-- Goals Grid -->
@@ -105,12 +117,8 @@
     </div>
 
     <script>
-      // Supabase Configuration - REPLACE WITH YOUR ACTUAL VALUES
-      const SUPABASE_URL = 'https://your-project-id.supabase.co';
-      const SUPABASE_ANON_KEY = 'your-anon-key-here';
-
-      // Initialize Supabase client
-      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      // Initialize Supabase client using centralized config
+      const supabaseClient = getSupabaseClient();
 
       // Format date
       function formatDate(dateString) {
@@ -168,6 +176,17 @@
 
       // Load all goals
       async function loadGoals() {
+        // Check if Supabase client is initialized
+        if (!supabaseClient) {
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('error').classList.remove('hidden');
+          document.getElementById('error-details').innerHTML = `
+            <p class="font-bold text-red-500 mb-2">Supabase not configured!</p>
+            <p>Please update <code class="bg-black/5 dark:bg-white/10 px-2 py-1 rounded">/js/config.js</code> with your credentials.</p>
+          `;
+          return;
+        }
+
         try {
           const { data, error } = await supabaseClient
             .from('goals')
@@ -191,6 +210,15 @@
           console.error('Error loading goals:', error);
           document.getElementById('loading').classList.add('hidden');
           document.getElementById('error').classList.remove('hidden');
+          
+          // Show detailed error message
+          const errorDetails = document.getElementById('error-details');
+          if (error.message) {
+            errorDetails.innerHTML = `
+              <p class="font-bold text-red-500 mb-2">Error: ${error.message}</p>
+              <p class="text-sm">Check the browser console for more details.</p>
+            `;
+          }
         }
       }
 

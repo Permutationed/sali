@@ -16,6 +16,7 @@
     />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/config.js"></script>
     <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -74,8 +75,19 @@
         <!-- Error State -->
         <div id="error" class="hidden text-center py-20">
           <span class="material-symbols-outlined text-6xl text-red-500 mb-4">error</span>
-          <h2 class="text-2xl font-bold mb-2">Goal Not Found</h2>
-          <p class="text-text-secondary dark:text-gray-400 mb-6">The goal you're looking for doesn't exist or has been removed.</p>
+          <h2 id="error-title" class="text-2xl font-bold mb-2">Goal Not Found</h2>
+          <div id="error-message" class="text-text-secondary dark:text-gray-400 mb-6">
+            <p>The goal you're looking for doesn't exist or has been removed.</p>
+          </div>
+          <div id="error-config-help" class="hidden bg-surface-light dark:bg-white/5 p-6 rounded-2xl border border-border-color dark:border-white/10 max-w-2xl mx-auto mb-6 text-left">
+            <h3 class="font-bold mb-3">Setup Instructions:</h3>
+            <ol class="list-decimal list-inside space-y-2 text-sm">
+              <li>Open <code class="bg-black/5 dark:bg-white/10 px-2 py-1 rounded">/js/config.js</code></li>
+              <li>Replace <code class="bg-black/5 dark:bg-white/10 px-2 py-1 rounded">SUPABASE_CONFIG.url</code> with your Supabase project URL</li>
+              <li>Replace <code class="bg-black/5 dark:bg-white/10 px-2 py-1 rounded">SUPABASE_CONFIG.anonKey</code> with your anon/public key</li>
+              <li>Get these from: Supabase Dashboard → Settings → API</li>
+            </ol>
+          </div>
           <a href="/goals.html" class="inline-block px-6 py-3 bg-primary text-white rounded-full font-bold hover:bg-primary-hover transition-colors">
             Browse All Goals
           </a>
@@ -155,12 +167,8 @@
     </div>
 
     <script>
-      // Supabase Configuration - REPLACE WITH YOUR ACTUAL VALUES
-      const SUPABASE_URL = 'https://your-project-id.supabase.co';
-      const SUPABASE_ANON_KEY = 'your-anon-key-here';
-
-      // Initialize Supabase client
-      const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      // Initialize Supabase client using centralized config
+      const supabaseClient = getSupabaseClient();
 
       // Get goal ID from URL
       function getGoalIdFromUrl() {
@@ -190,10 +198,16 @@
 
       // Load goal data
       async function loadGoal() {
+        // Check if Supabase client is initialized
+        if (!supabaseClient) {
+          showError('Supabase Configuration Error', 'Supabase is not configured. Please update /js/config.js with your credentials.', true);
+          return;
+        }
+
         const goalId = getGoalIdFromUrl();
         
         if (!goalId) {
-          showError();
+          showError('Invalid Goal ID', 'No goal ID provided in the URL.');
           return;
         }
 
@@ -209,11 +223,11 @@
           if (data) {
             displayGoal(data);
           } else {
-            showError();
+            showError('Goal Not Found', 'The goal you\'re looking for doesn\'t exist or has been removed.');
           }
         } catch (error) {
           console.error('Error loading goal:', error);
-          showError();
+          showError('Error Loading Goal', error.message || 'Failed to load goal. Please check your Supabase configuration.');
         }
       }
 
@@ -266,9 +280,16 @@
       }
 
       // Show error state
-      function showError() {
+      function showError(title = 'Goal Not Found', message = 'The goal you\'re looking for doesn\'t exist or has been removed.', showConfigHelp = false) {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('error').classList.remove('hidden');
+        document.getElementById('error-title').textContent = title;
+        document.getElementById('error-message').innerHTML = `<p>${message}</p>`;
+        if (showConfigHelp) {
+          document.getElementById('error-config-help').classList.remove('hidden');
+        } else {
+          document.getElementById('error-config-help').classList.add('hidden');
+        }
       }
 
       // Copy goal link
