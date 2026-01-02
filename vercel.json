@@ -1,0 +1,21 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/config",
+      "destination": "/api/config"
+    },
+    {
+      "source": "/:id(\\d+)",
+      "destination": "/goal.html?id=:id"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET" }
+      ]
+    }
+  ]
+}
