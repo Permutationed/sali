@@ -173,14 +173,28 @@
       // Get goal ID from URL
       function getGoalIdFromUrl() {
         const path = window.location.pathname;
-        // Handle both /goal.html?id=123 and /123 formats
+        // Handle /goal.html?id=xxx format (query parameter)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('id')) {
           return urlParams.get('id');
         }
-        // Extract ID from path like /123 or /goal-123
-        const match = path.match(/\/(\d+)$/);
-        return match ? match[1] : null;
+        // Extract ID from path - supports both numeric IDs and UUIDs
+        // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        // Numeric format: /123
+        const uuidMatch = path.match(/\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$/i);
+        if (uuidMatch) {
+          return uuidMatch[1];
+        }
+        const numericMatch = path.match(/\/(\d+)$/);
+        if (numericMatch) {
+          return numericMatch[1];
+        }
+        // Also try to get any path segment after the last /
+        const segments = path.split('/').filter(s => s && !s.includes('.html'));
+        if (segments.length > 0) {
+          return segments[segments.length - 1];
+        }
+        return null;
       }
 
       // Format date
