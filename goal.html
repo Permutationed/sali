@@ -215,22 +215,28 @@
         }
 
         try {
+          // Use maybeSingle() instead of single() to avoid error when no rows found
           const { data, error } = await supabaseClient
             .from('goals')
             .select('*')
             .eq('id', goalId)
-            .single();
+            .maybeSingle();
 
           if (error) throw error;
 
           if (data) {
             displayGoal(data);
           } else {
-            showError('Goal Not Found', 'The goal you\'re looking for doesn\'t exist or has been removed.');
+            showError('Goal Not Found', `No goal found with ID: ${goalId}. It may have been deleted or the ID is incorrect.`);
           }
         } catch (error) {
           console.error('Error loading goal:', error);
-          showError('Error Loading Goal', error.message || 'Failed to load goal. Please check your Supabase configuration.');
+          // Check for common errors
+          let errorMessage = error.message || 'Failed to load goal.';
+          if (error.message && error.message.includes('does not exist')) {
+            errorMessage = 'The goals table does not exist in your database. Please create it first.';
+          }
+          showError('Error Loading Goal', errorMessage);
         }
       }
 
